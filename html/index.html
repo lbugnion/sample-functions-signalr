@@ -86,37 +86,6 @@
             }
         });
 
-        data.name = prompt("Enter your username");
-        if (!data.name) {
-            alert("No name entered. Reload page and try again.");
-            throw "No name entered";
-        }
-
-        getConnectionInfo().then(info => {
-            // make compatible with old and new SignalRConnectionInfo
-            info.accessToken = info.accessToken || info.accessKey;
-            info.url = info.url || info.endpoint;
-
-            data.ready = true;
-            const options = {
-                accessTokenFactory: () => info.accessToken
-            };
-
-            const connection = new signalR.HubConnectionBuilder()
-                .withUrl(info.url, options)
-                .configureLogging(signalR.LogLevel.Information)
-                .build();
-
-            connection.on('newMessage', getNewMessage);
-            connection.onclose(() => console.log('disconnected'));
-
-            console.log('connecting...');
-            connection.start()
-                .then(() => console.log('connected!'))
-                .catch(console.error);
-
-        }).catch(alert);
-
         function getAxiosConfig() {
             const config = {
                 headers: {}
@@ -142,6 +111,37 @@
             message.id = counter++; // vue transitions need an id
             data.messages.unshift(message);
         }
+
+        data.name = prompt("Enter your username");
+
+        if (!data.name) {
+            alert("No name entered. Reload page and try again.");
+            throw "No name entered";
+        }
+
+        getConnectionInfo().then(info => {
+
+            data.ready = true;
+            const options = {
+                accessTokenFactory: () => info.accessToken
+            };
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl(info.url, options)
+                .configureLogging(signalR.LogLevel.Information)
+                .build();
+
+            connection.on('newMessage', getNewMessage);
+
+            connection.onclose(() => console.log('disconnected'));
+
+            console.log('connecting...');
+
+            connection.start()
+                .then(() => console.log('connected!'))
+                .catch(console.error);
+
+        }).catch(alert);
 
     </script>
 </body>
