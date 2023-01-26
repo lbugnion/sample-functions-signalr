@@ -11,12 +11,13 @@ namespace ChatClientBlazor.Pages
     public partial class Index
     {
 #if DEBUG
-        private static HttpClient _http;
-        private HubConnection _connection;
         public const string ApiBaseUrl = "http://localhost:7071";
 #else
         public const string ApiBaseUrl = "";
 #endif
+
+        private static HttpClient _http;
+        private HubConnection _connection;
 
         public static HttpClient Http
         {
