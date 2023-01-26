@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace ChatClientBlazor.Model
+﻿namespace ChatClientBlazor.Model
 {
     public class FormModel
     {

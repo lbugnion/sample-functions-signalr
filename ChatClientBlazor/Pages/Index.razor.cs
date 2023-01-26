@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
-using System.Data.Common;
 using System.Text.Json;
 
 namespace ChatClientBlazor.Pages
@@ -12,8 +11,9 @@ namespace ChatClientBlazor.Pages
     public partial class Index
     {
 #if DEBUG
-        public const string ApiBaseUrl = "http://localhost:7071";
         private static HttpClient _http;
+        private HubConnection _connection;
+        public const string ApiBaseUrl = "http://localhost:7071";
 #else
         public const string ApiBaseUrl = "";
 #endif
@@ -31,23 +31,34 @@ namespace ChatClientBlazor.Pages
             }
         }
 
+        public EditContext CurrentEditContext { get; private set; }
+
+        public List<Message> Messages { get; set; } = new List<Message>();
+
+        public FormModel Model { get; set; } = new FormModel();
+
+        public string NewMessage { get; set; }
+
         public bool Ready { get; set; }
 
         public string UserName { get; set; } = string.Empty;
 
-        public List<Message> Messages { get; set; } = new List<Message>();
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        private async Task Connect()
         {
-            if (firstRender)
-            {
-                UserName = await JSRuntime.InvokeAsync<string>("askUserName");
+            var connectionInfoJson = await Http.GetStringAsync($"{ApiBaseUrl}/api/negotiate");
+            var connectionInfo = JsonConvert.DeserializeObject<ConnectionInfo>(connectionInfoJson);
 
-                await Connect();
+            _connection = new HubConnectionBuilder()
+                .WithUrl(connectionInfo.Url, options =>
+                {
+                    options.AccessTokenProvider = async () => connectionInfo.AccessToken;
+                })
+                .WithAutomaticReconnect()
+                .Build();
 
-                Ready = true;
-                StateHasChanged();
-            }
+            _connection.On<JsonDocument>("newMessage", ReceiveNewMessage);
+
+            await _connection.StartAsync();
         }
 
         private void FormKeyPressed(KeyboardEventArgs args)
@@ -58,11 +69,12 @@ namespace ChatClientBlazor.Pages
             }
         }
 
-        public EditContext CurrentEditContext { get; private set; }
-
-        public FormModel Model { get; set; } = new FormModel();
-
-        public string NewMessage { get; set; } 
+        private void ReceiveNewMessage(JsonDocument message)
+        {
+            var content = message.Deserialize<Message>();
+            Messages.Insert(0, content);
+            StateHasChanged();
+        }
 
         private async void SendNewMessage()
         {
@@ -80,43 +92,22 @@ namespace ChatClientBlazor.Pages
             Model.NewMessage = string.Empty;
         }
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                UserName = await JSRuntime.InvokeAsync<string>("askUserName");
+
+                await Connect();
+
+                Ready = true;
+                StateHasChanged();
+            }
+        }
+
+        protected override void OnInitialized()
         {
             CurrentEditContext = new EditContext(Model);
-        }
-
-        private HubConnection? _connection;
-
-        private async Task Connect()
-        {
-            var connectionInfoJson = await Http.GetStringAsync($"{ApiBaseUrl}/api/negotiate");
-            var connectionInfo = JsonConvert.DeserializeObject<ConnectionInfo>(connectionInfoJson);
-
-            _connection = new HubConnectionBuilder()
-                .WithUrl(connectionInfo.Url, options =>
-                {
-                    options.AccessTokenProvider = async () => connectionInfo.AccessToken;
-                })
-                .WithAutomaticReconnect()
-                .Build();
-
-            _connection.On<JsonDocument>("newMessage", ReceiveNewMessage);
-
-            _connection.Closed += ConnectionClosed;
-
-            await _connection.StartAsync();
-        }
-
-        private async Task ConnectionClosed(Exception arg)
-        {
-
-        }
-
-        private void ReceiveNewMessage(JsonDocument message)
-        {
-            var content = message.Deserialize<Message>();
-            Messages.Insert(0, content);
-            StateHasChanged();
         }
     }
 }
