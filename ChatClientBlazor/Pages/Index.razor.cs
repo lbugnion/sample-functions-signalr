@@ -13,7 +13,7 @@ namespace ChatClientBlazor.Pages
 #if DEBUG
         public const string ApiBaseUrl = "http://localhost:7071";
 #else
-        public const string ApiBaseUrl = "";
+        public const string ApiBaseUrl = "https://lemon-pond-0169aab03.2.azurestaticapps.net";
 #endif
 
         private static HttpClient _http;
