@@ -91,6 +91,7 @@ namespace ChatClientBlazor.Pages
             await Http.PostAsync($"{ApiBaseUrl}/api/talk", content);
 
             Model.NewMessage = string.Empty;
+            StateHasChanged();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
