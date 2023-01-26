@@ -63,7 +63,3 @@ Follow the steps:
 - In the Azure portal, create a new SignalR service.
   - Go to the [Azure portal](https://portal.azure.com/).
   - Click on `Create a Resource`.
-
-![]()
-
-  - 
