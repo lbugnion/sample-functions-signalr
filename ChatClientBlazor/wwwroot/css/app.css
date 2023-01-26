@@ -1,3 +1,11 @@
+body {
+    padding: 20px;
+}
+
+#input-text {
+    width: 300px;
+}
+
 h1:focus {
     outline: none;
 }

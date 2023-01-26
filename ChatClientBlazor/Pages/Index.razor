@@ -22,6 +22,9 @@ else
             <EditForm EditContext="@CurrentEditContext">
 
                 <input type="text"
+                    id="input-text"
+                    title="Enter your message"
+                    placeholder="Enter your message"
                     @bind="@Model.NewMessage"
                     @bind:event="oninput"
                     @onkeypress="@FormKeyPressed"
@@ -33,7 +36,7 @@ else
 
     @foreach (var message in Messages)
     {
-        <div class="row" v-bind:key="message.id">
+        <div class="row">
             <div class="col-sm">
                 <hr />
                 <div>
