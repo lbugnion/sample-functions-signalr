@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using System.Data.Common;
+using System.Text.Json;
 
 namespace ChatClientBlazor.Pages
 {
@@ -75,13 +76,14 @@ namespace ChatClientBlazor.Pages
             var content = new StringContent(json);
 
             await Http.PostAsync($"{ApiBaseUrl}/api/talk", content);
+
+            Model.NewMessage = string.Empty;
         }
 
         protected override async Task OnInitializedAsync()
         {
             CurrentEditContext = new EditContext(Model);
         }
-
 
         private HubConnection? _connection;
 
@@ -98,7 +100,7 @@ namespace ChatClientBlazor.Pages
                 .WithAutomaticReconnect()
                 .Build();
 
-            _connection.On<string>("newMessage", ReceiveNewMessage);
+            _connection.On<JsonDocument>("newMessage", ReceiveNewMessage);
 
             _connection.Closed += ConnectionClosed;
 
@@ -110,9 +112,11 @@ namespace ChatClientBlazor.Pages
 
         }
 
-        private void ReceiveNewMessage(string message)
+        private void ReceiveNewMessage(JsonDocument message)
         {
-            Console.WriteLine(message);
+            var content = message.Deserialize<Message>();
+            Messages.Insert(0, content);
+            StateHasChanged();
         }
     }
 }
