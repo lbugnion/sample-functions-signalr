@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.Forms
 @inject IJSRuntime JSRuntime
 
 <h3>Chat Client for Web</h3>
@@ -18,9 +19,15 @@ else
     <div class="row">
         <div class="signalr-demo col-sm">
             <hr />
-            <form v-on:submit.prevent="sendNewMessage">
-                <input type="text" v-model="newMessage" id="message-box" class="form-control" placeholder="Type your message here..." />
-            </form>
+            <EditForm EditContext="@CurrentEditContext">
+
+                <input type="text"
+                    @bind="@Model.NewMessage"
+                    @bind:event="oninput"
+                    @onkeypress="@FormKeyPressed"
+                    onreadystatechange="this.focus();" />
+
+            </EditForm>
         </div>
     </div>
 

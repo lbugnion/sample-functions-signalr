@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Newtonsoft.Json.Linq;
+using ChatClientBlazor.Model;
 
 namespace ChatServer
 {
@@ -25,26 +26,21 @@ namespace ChatServer
             IAsyncCollector<SignalRMessage> questionR,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
-
             try
             {
                 string json = await new StreamReader(req.Body).ReadToEndAsync();
-                dynamic obj = JsonConvert.DeserializeObject(json);
-
-                var name = obj.name.ToString();
-                var text = obj.text.ToString();
-
-                var jObject = new JObject(obj);
+                var message = JsonConvert.DeserializeObject<Message>(json);
 
                 await questionR.AddAsync(
                     new SignalRMessage
                     {
                         Target = "newMessage",
-                        Arguments = new[] { jObject }
+                        Arguments = new[] { message }
                     });
 
-                return new OkObjectResult($"Hello {name}, your message was '{text}'");
+                log.LogInformation($"Sent message '{message.Text}'");
+
+                return new OkObjectResult($"Hello {message.Name}, your message was '{message.Text}'");
             }
             catch (Exception ex)
             {
