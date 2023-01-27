@@ -16,7 +16,7 @@ namespace ChatClientBlazor.Pages
 #if DEBUG
         public const string ApiBaseUrl = "http://localhost:7071";
 #else
-        public const string ApiBaseUrl = "https://zealous-island-024591e03.2.azurestaticapps.net/";
+        public const string ApiBaseUrl = "https://zealous-island-024591e03.2.azurestaticapps.net";
 #endif
 
         private static HttpClient _http;
