@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace ChatClientBlazor.Pages
 {
@@ -13,7 +16,7 @@ namespace ChatClientBlazor.Pages
 #if DEBUG
         public const string ApiBaseUrl = "http://localhost:7071";
 #else
-        public const string ApiBaseUrl = "https://lemon-pond-0169aab03.2.azurestaticapps.net";
+        public const string ApiBaseUrl = "https://zealous-island-024591e03.2.azurestaticapps.net/";
 #endif
 
         private static HttpClient _http;
