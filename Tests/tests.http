@@ -1,1 +1,1 @@
-GET http://localhost:7071/api/negotiate
+GET https://zealous-island-024591e03.2.azurestaticapps.net/api/negotiate
