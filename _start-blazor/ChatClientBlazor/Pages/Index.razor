@@ -1,0 +1,59 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Forms
+@inject IJSRuntime JSRuntime
+
+<h3>Welcome to the Chat Client for Blazor</h3>
+
+@if (!Ready)
+{
+    <div class="row">
+        <div class="col-sm">
+            <div>Loading...</div>
+        </div>
+    </div>
+}
+else
+{
+    <h4>Hello @UserName</h4>
+
+    <div class="row">
+        <div class="signalr-demo col-sm">
+            <hr />
+            <EditForm EditContext="@CurrentEditContext">
+
+                <input type="text"
+                    id="input-text"
+                    title="Enter your message"
+                    placeholder="Enter your message"
+                    @bind="@Model.NewMessage"
+                    @bind:event="oninput"
+                    @onkeypress="@FormKeyPressed"
+                    onreadystatechange="this.focus();" />
+
+            </EditForm>
+        </div>
+    </div>
+
+    @foreach (var message in Messages)
+    {
+        <div class="row">
+            <div class="col-sm">
+                <hr />
+                <div>
+                    <div style="display: inline-block; padding-left: 12px;">
+                        <div>
+                            <span class="text-info small">
+                                <strong>
+                                    @message.Name
+                                </strong>
+                            </span>
+                        </div>
+                        <div>
+                            @message.Text
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
