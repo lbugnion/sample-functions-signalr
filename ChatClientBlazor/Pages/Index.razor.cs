@@ -10,22 +10,23 @@ namespace ChatClientBlazor.Pages
 {
     public partial class Index
     {
-#if DEBUG
-        public const string ApiBaseUrl = "http://localhost:7071";
-#else
-        public const string ApiBaseUrl = "https://zealous-island-024591e03.2.azurestaticapps.net";
-#endif
-
         private static HttpClient _http;
         private HubConnection _connection;
 
-        public static HttpClient Http
+        public HttpClient Http
         {
             get
             {
                 if (_http == null)
                 {
-                    _http = new HttpClient();
+                    _http = new HttpClient
+                    {
+#if DEBUG
+                        BaseAddress = new Uri("http://localhost:7071/")
+#else
+                        BaseAddress = new Uri(Nav.BaseUri)
+#endif
+                    };
                 }
 
                 return _http;
@@ -46,7 +47,7 @@ namespace ChatClientBlazor.Pages
 
         private async Task Connect()
         {
-            var connectionInfoJson = await Http.GetStringAsync($"{ApiBaseUrl}/api/negotiate");
+            var connectionInfoJson = await Http.GetStringAsync($"api/negotiate");
             var connectionInfo = JsonConvert.DeserializeObject<ConnectionInfo>(connectionInfoJson);
 
             _connection = new HubConnectionBuilder()
@@ -88,7 +89,7 @@ namespace ChatClientBlazor.Pages
             var json = JsonConvert.SerializeObject(message);
             var content = new StringContent(json);
 
-            await Http.PostAsync($"{ApiBaseUrl}/api/talk", content);
+            await Http.PostAsync($"api/talk", content);
 
             Model.NewMessage = string.Empty;
             StateHasChanged();
